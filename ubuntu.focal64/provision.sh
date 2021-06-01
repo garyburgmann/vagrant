@@ -14,7 +14,9 @@ echo "deb [signed-by=/usr/share/keyrings/kubernetes-archive-keyring.gpg] https:/
 apt-get update
 apt-get install -y kubelet kubeadm kubectl
 apt-mark hold kubelet kubeadm kubectl
-kubeadm init
+NODENAME=$(hostname -s)
+IPADDR=192.168.33.11
+kubeadm init --apiserver-cert-extra-sans=$IPADDR  --node-name $NODENAME
 mkdir -p $HOME/.kube
 cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
 sudo chown $(id -u):$(id -g) $HOME/.kube/config
