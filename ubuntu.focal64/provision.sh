@@ -20,13 +20,14 @@ apt-get install -y kubelet kubeadm kubectl
 apt-mark hold kubelet kubeadm kubectl
 NODENAME=$(hostname -s)
 IPADDR=192.168.33.11
-kubeadm init --apiserver-cert-extra-sans=$IPADDR  --node-name $NODENAME
+# https://github.com/flannel-io/flannel/blob/master/Documentation/kube-flannel.yml -> --pod-network-cidr=10.244.0.0/16
+kubeadm init --apiserver-cert-extra-sans=$IPADDR --node-name $NODENAME --pod-network-cidr=10.244.0.0/16
 sleep 30
 mkdir -p $HOME/.kube
 cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
 chown $(id -u):$(id -g) $HOME/.kube/config
-kubectl taint nodes --all node-role.kubernetes.io/master-
 kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
+kubectl taint nodes --all node-role.kubernetes.io/master-
 # export KUBECONFIG=/etc/kubernetes/admin.conf
 # kubeadm token list
 echo "preparing python"
