@@ -1,7 +1,11 @@
+export DEBIAN_FRONTEND=noninteractive
 apt-get update
 echo "upgrading system"
 apt-get upgrade -y
 apt-get autoremove -y
+# disable swap
+swapoff -a
+sed -i '/swap/d' /etc/fstab
 echo "preparing docker"
 apt-get update && apt-get install -y curl
 curl -fsSL https://get.docker.com | bash
@@ -17,11 +21,14 @@ apt-mark hold kubelet kubeadm kubectl
 NODENAME=$(hostname -s)
 IPADDR=192.168.33.11
 kubeadm init --apiserver-cert-extra-sans=$IPADDR  --node-name $NODENAME
+sleep 30
 mkdir -p $HOME/.kube
 cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
-sudo chown $(id -u):$(id -g) $HOME/.kube/config
+chown $(id -u):$(id -g) $HOME/.kube/config
+kubectl taint nodes --all node-role.kubernetes.io/master-
+kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
 # export KUBECONFIG=/etc/kubernetes/admin.conf
-kubeadm token list
+# kubeadm token list
 echo "preparing python"
 apt-get update
 apt-get install -y software-properties-common
