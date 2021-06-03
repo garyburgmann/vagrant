@@ -72,11 +72,11 @@ Vagrant.configure("2") do |config|
   #   apt-get update
   #   apt-get install -y apache2
   # SHELL
-  config.vm.provision "shell", path: "./bin/upgrade_system.sh", privileged: true
-  config.vm.provision "shell", path: "./bin/install_python.sh", privileged: true
-  config.vm.provision "shell", path: "./bin/install_anaconda.sh", privileged: false
-  config.vm.provision "shell", path: "./bin/install_docker.sh", privileged: true
-  config.vm.provision "shell", path: "./bin/install_k8s.sh", privileged: true
-  config.vm.provision "shell", path: "./bin/install_singularity.sh", privileged: false
-  config.vm.provision "shell", path: "./bin/reboot.sh", privileged: true
+  config.vm.provision "shell", path: "./bin/provision/upgrade_system.sh", privileged: true
+  config.vm.provision "shell", path: "./bin/provision/install_python.sh", privileged: true
+  config.vm.provision "shell", path: "./bin/provision/install_anaconda.sh", privileged: false
+  config.vm.provision "shell", path: "./bin/provision/install_docker.sh", privileged: true
+  config.vm.provision "shell", path: "./bin/provision/install_k8s.sh", privileged: true
+  config.vm.provision "shell", path: "./bin/provision/install_singularity.sh", privileged: false
+  config.vm.provision "shell", path: "./bin/provision/reboot.sh", privileged: true
 end
