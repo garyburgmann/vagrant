@@ -1,2 +1,4 @@
 .vagrant/
 kubeconfig
+kubernetes/provision/config
+kubernetes/provision/join.sh
