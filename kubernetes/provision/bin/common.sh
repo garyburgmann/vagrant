@@ -2,7 +2,7 @@
 sudo dnf update -y
 sudo dnf upgrade -y
 
-# use cri-o instead of docker
+# use docker instead of cri-o
 # curl -fsSL https://get.docker.com | bash
 # sudo usermod -aG docker vagrant
 # # https://kubernetes.io/docs/setup/production-environment/container-runtimes/#docker
@@ -19,25 +19,21 @@ sudo dnf upgrade -y
 # EOF
 # sudo systemctl enable --now docker
 
-OS=CentOS_8
-sudo curl -L -o /etc/yum.repos.d/devel:kubic:libcontainers:stable.repo https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/$OS/devel:kubic:libcontainers:stable.repo
-sudo curl -L -o /etc/yum.repos.d/devel:kubic:libcontainers:stable:cri-o:$CRI_VERSION.repo https://download.opensuse.org/repositories/devel:kubic:libcontainers:stable:cri-o:$CRI_VERSION/$OS/devel:kubic:libcontainers:stable:cri-o:$CRI_VERSION.repo
+# use cri-o instead of docker
 
-# sudo dnf module enable cri-o:$CRI_VERSION
+sudo curl -L -o /etc/yum.repos.d/devel:kubic:libcontainers:stable.repo https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/$CRI_OS/devel:kubic:libcontainers:stable.repo
+sudo curl -L -o /etc/yum.repos.d/devel:kubic:libcontainers:stable:cri-o:$CRI_VERSION.repo https://download.opensuse.org/repositories/devel:kubic:libcontainers:stable:cri-o:$CRI_VERSION/$CRI_OS/devel:kubic:libcontainers:stable:cri-o:$CRI_VERSION.repo
 
+# for both
 sudo dnf install -y cri-o
 
+# post install for both
 sudo systemctl daemon-reload
 sudo systemctl enable --now crio
 
-# sudo mkdir -p /etc/crio/crio.conf.d
-# cat <<EOF | sudo tee /etc/crio/crio.conf.d/02-cgroup-manager.conf
-# [crio.runtime]
-# conmon_cgroup = "pod"
-# cgroup_manager = "cgroupfs"
-# EOF
-
 sudo systemctl restart crio
+
+sudo dnf install -y podman
 
 sudo dnf upgrade -y
 

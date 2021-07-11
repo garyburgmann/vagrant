@@ -1,10 +1,10 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-# BOX = "fedora/34-cloud-base"
-# BOX_VERSION = "34.20210423.0"
-BOX = "rockylinux/8"
-BOX_VERSION = "4.0.0"
+BOX = "fedora/34-cloud-base"
+BOX_VERSION = "34.20210423.0"
+# BOX = "rockylinux/8"
+# BOX_VERSION = "4.0.0"
 
 MASTERS_NUM = 1
 MASTERS_CPU = 2
@@ -18,17 +18,17 @@ IP_BASE = "192.168.50."
 POD_NETWORK_CIDR = "10.244.0.0/16"
 # POD_NETWORK_CIDR = "192.168.0.0/16"
 
-# DOCKER_REPO = "fedora"
-DOCKER_REPO = "centos"
 K8S_VERSION = "1.21.1"
 CRI_VERSION = "1.21"  # only works for major.minor
+CRI_OS = "Fedora_34"
+# CRI_OS = "CentOS_8"
+
 
 # All Vagrant configuration is done below. The "2" in Vagrant.configure
 # configures the configuration version (we support older styles for
 # backwards compatibility). Please don't change it unless you know what
 # you're doing.
 Vagrant.configure("2") do |config|
-  # The most common configuration options are documented and commented below.
   # For a complete reference, please see the online documentation at
   # https://docs.vagrantup.com.
 
@@ -56,8 +56,7 @@ Vagrant.configure("2") do |config|
         v.memory = MASTERS_MEM
         v.cpus = MASTERS_CPU
       end
-      # master.vm.synced_folder ".", "/vagrant", type: "virtualbox"  # default => type: "rsync"
-      master.vm.provision "shell", path: "./provision/bin/common.sh", privileged: false, env: {"K8S_VERSION" => K8S_VERSION, "DOCKER_REPO" => DOCKER_REPO, "CRI_VERSION" => CRI_VERSION, "KUBELET_EXTRA_ARGS" => "--node-ip=#{ip}"}
+      master.vm.provision "shell", path: "./provision/bin/common.sh", privileged: false, env: {"K8S_VERSION" => K8S_VERSION, "CRI_VERSION" => CRI_VERSION, "CRI_OS" => CRI_OS, "KUBELET_EXTRA_ARGS" => "--node-ip=#{ip}"}
       master.vm.provision "shell", path: "./provision/bin/prepare_master.sh", privileged: false, env: {"IPADDR" => ip, "NAME" => name, "POD_NETWORK_CIDR" => POD_NETWORK_CIDR}
     end
   end
@@ -74,73 +73,9 @@ Vagrant.configure("2") do |config|
           v.memory = NODES_MEM
           v.cpus = NODES_CPU
       end
-      # node.vm.synced_folder ".", "/vagrant", type: "virtualbox"  # default => type: "rsync"
-      node.vm.provision "shell", path: "./provision/bin/common.sh", privileged: false, env: {"K8S_VERSION" => K8S_VERSION, "DOCKER_REPO" => DOCKER_REPO, "CRI_VERSION" => CRI_VERSION, "KUBELET_EXTRA_ARGS" => "--node-ip=#{ip}"}
+      node.vm.provision "shell", path: "./provision/bin/common.sh", privileged: false, env: {"K8S_VERSION" => K8S_VERSION, "CRI_VERSION" => CRI_VERSION, "CRI_OS" => CRI_OS, "KUBELET_EXTRA_ARGS" => "--node-ip=#{ip}"}
       node.vm.provision "shell", path: "./provision/bin/prepare_node.sh", privileged: false
     end
   end
 
-  # Disable automatic box update checking. If you disable this, then
-  # boxes will only be checked for updates when the user runs
-  # `vagrant box outdated`. This is not recommended.
-  # config.vm.box_check_update = false
-
-  # Create a forwarded port mapping which allows access to a specific port
-  # within the machine from a port on the host machine. In the example below,
-  # accessing "localhost:8080" will access port 80 on the guest machine.
-  # NOTE: This will enable public access to the opened port
-  # config.vm.network "forwarded_port", guest: 80, host: 8080
-
-  # Create a forwarded port mapping which allows access to a specific port
-  # within the machine from a port on the host machine and only allow access
-  # via 127.0.0.1 to disable public access
-  # config.vm.network "forwarded_port", guest: 6443, host: 26443, host_ip: "127.0.0.1"
-  # config.vm.network "forwarded_port", guest: 8080, host: 28080, host_ip: "127.0.0.1"
-
-  # Create a private network, which allows host-only access to the machine
-  # using a specific IP.
-  # config.vm.network "private_network", ip: "192.168.33.12"
-
-  # Create a public network, which generally matched to bridged network.
-  # Bridged networks make the machine appear as another physical device on
-  # your network.
-  # config.vm.network "public_network"
-
-  # Share an additional folder to the guest VM. The first argument is
-  # the path on the host to the actual folder. The second argument is
-  # the path on the guest to mount the folder. And the optional third
-  # argument is a set of non-required options.
-  # config.vm.synced_folder "../data", "/vagrant_data"
-
-  # Provider-specific configuration so you can fine-tune various
-  # backing providers for Vagrant. These expose provider-specific options.
-  # Example for VirtualBox:
-  #
-  # config.vm.provider "virtualbox" do |vb|
-  #   # Display the VirtualBox GUI when booting the machine
-  #   # vb.gui = true
-  
-  #   # Customize the amount of memory on the VM:
-  #   vb.memory = "4096"
-
-  #   vb.cpus = 2
-  # end
-  #
-  # View the documentation for the provider you are using for more
-  # information on available options.
-
-  # Enable provisioning with a shell script. Additional provisioners such as
-  # Ansible, Chef, Docker, Puppet and Salt are also available. Please see the
-  # documentation for more information about their specific syntax and use.
-  # config.vm.provision "shell", inline: <<-SHELL
-  #   apt-get update
-  #   apt-get install -y apache2
-  # SHELL
-  # config.vm.provision "shell", path: "./bin/provision/upgrade_system.sh", privileged: true
-  # config.vm.provision "shell", path: "./bin/provision/install_python.sh", privileged: true
-  # # config.vm.provision "shell", path: "./bin/provision/install_anaconda.sh", privileged: false
-  # config.vm.provision "shell", path: "./bin/provision/install_docker.sh", privileged: true
-  # config.vm.provision "shell", path: "./bin/provision/install_k8s.sh", privileged: true
-  # config.vm.provision "shell", path: "./bin/provision/install_singularity.sh", privileged: false
-  # config.vm.provision "shell", path: "./bin/provision/reboot.sh", privileged: true
 end
