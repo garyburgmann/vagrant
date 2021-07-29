@@ -1,0 +1,29 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+BOX = "fedora/34-cloud-base"
+BOX_VERSION = "34.20210423.0"
+HOSTNAME = "fedora"
+NETWORK_TYPE = "private_network"
+NETWORK_IP = "192.168.44.44"
+MEMORY = 4096
+CPU = 2
+HOST_CODE_DIR = "~/code"
+GUEST_CODE_DIR = "/home/vagrant/code"
+
+Vagrant.configure("2") do |config|
+
+  config.vm.box = BOX
+  config.vm.box_version = BOX_VERSION
+  config.vm.hostname = HOSTNAME
+  config.vm.network NETWORK_TYPE, ip: NETWORK_IP, hostname: true
+  config.vm.synced_folder HOST_CODE_DIR, GUEST_CODE_DIR, type: "virtualbox"  # default => type: "rsync"
+
+  config.vm.provider "virtualbox" do |v|
+    v.memory = MEMORY
+    v.cpus = CPU
+  end
+
+  config.vm.provision "shell", path: "./bin/provision.sh", privileged: false
+
+end
