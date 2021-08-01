@@ -8,7 +8,7 @@ BOX_VERSION = "202107.28.0"
 
 HOSTNAME = "ubuntu"
 NETWORK_TYPE = "private_network"
-NETWORK_IP = "192.168.27.27"
+NETWORK_IP = "192.168.44.27"
 MEMORY = 4096
 CPU = 2
 HOST_CODE_DIR = "~/code"
