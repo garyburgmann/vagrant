@@ -1,6 +1,7 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
+VM_NAME = "fedora.34"
 # BOX = "fedora/34-cloud-base"
 # BOX_VERSION = "34.20210423.0"
 BOX = "bento/fedora-34"
@@ -18,6 +19,8 @@ Vagrant.configure("2") do |config|
 
   config.vm.box = BOX
   config.vm.box_version = BOX_VERSION
+  config.vm.define VM_NAME
+
   config.vm.hostname = HOSTNAME
   config.vm.network NETWORK_TYPE, ip: NETWORK_IP, hostname: true
   config.vm.synced_folder HOST_CODE_DIR, GUEST_CODE_DIR, type: "virtualbox"  # default => type: "rsync"
