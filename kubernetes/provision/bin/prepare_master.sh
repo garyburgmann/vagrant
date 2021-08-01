@@ -16,7 +16,8 @@ sudo chown $(id -u):$(id -g) $HOME/.kube/config $CONFIG_DIR/config
 sudo kubeadm token create --print-join-command > $CONFIG_DIR/join.sh
 sudo chmod +x $CONFIG_DIR/join.sh
 
-# kubectl taint nodes --all node-role.kubernetes.io/master-
+# allow master to run pods
+kubectl taint nodes --all node-role.kubernetes.io/master-
 
 kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
 

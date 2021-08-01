@@ -1,14 +1,15 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-BOX = "fedora/34-cloud-base"
-BOX_VERSION = "34.20210423.0"
-# BOX = "rockylinux/8"
-# BOX_VERSION = "4.0.0"
+# BOX = "fedora/34-cloud-base"
+# BOX_VERSION = "34.20210423.0"
+# BOX = "bento/fedora-34"
+BOX = "bento/rockylinux-8.4"
+BOX_VERSION = "202107.08.0"
 
 MASTERS_NUM = 1
 MASTERS_CPU = 2
-MASTERS_MEM = 2048
+MASTERS_MEM = 4096
 
 NODES_NUM = 2
 NODES_CPU = 2
@@ -20,8 +21,8 @@ POD_NETWORK_CIDR = "10.244.0.0/16"
 
 K8S_VERSION = "1.21.1"
 CRI_VERSION = "1.21"  # only works for major.minor
-CRI_OS = "Fedora_34"
-# CRI_OS = "CentOS_8"
+# CRI_OS = "Fedora_34"
+CRI_OS = "CentOS_8"
 
 
 # All Vagrant configuration is done below. The "2" in Vagrant.configure
@@ -41,7 +42,14 @@ Vagrant.configure("2") do |config|
   # config.vm.define "fedora34"
 
   if Vagrant.has_plugin?("vagrant-vbguest")
-    config.vbguest.auto_update = false
+    # config.vbguest.auto_update = false
+    # don't run dnf update otherwise kernel updates will cause issues with guest additions upgrades
+    config.vbguest.installer_hooks[:before_install] = [
+      # "dnf update -y",
+      "dnf install -y epel-release",
+      "dnf install -y gcc make perl kernel-devel-$(uname -r) kernel-headers-$(uname -r) bzip2 dkms",
+      # "dnf update -y kernel-*",
+    ]
   end
 
   (1..MASTERS_NUM).each do |i|
@@ -61,21 +69,21 @@ Vagrant.configure("2") do |config|
     end
   end
 
-  (1..NODES_NUM).each do |j|
-    name = "node-#{j}"
-    ip = "#{IP_BASE}#{j + 10 + MASTERS_NUM}"
-    config.vm.define name do |node|
-      node.vm.box = BOX
-      node.vm.box_version = BOX_VERSION
-      node.vm.network "private_network", ip: ip
-      node.vm.hostname = name
-      node.vm.provider "virtualbox" do |v|
-          v.memory = NODES_MEM
-          v.cpus = NODES_CPU
-      end
-      node.vm.provision "shell", path: "./provision/bin/common.sh", privileged: false, env: {"K8S_VERSION" => K8S_VERSION, "CRI_VERSION" => CRI_VERSION, "CRI_OS" => CRI_OS, "KUBELET_EXTRA_ARGS" => "--node-ip=#{ip}"}
-      node.vm.provision "shell", path: "./provision/bin/prepare_node.sh", privileged: false
-    end
-  end
+  # (1..NODES_NUM).each do |j|
+  #   name = "node-#{j}"
+  #   ip = "#{IP_BASE}#{j + 10 + MASTERS_NUM}"
+  #   config.vm.define name do |node|
+  #     node.vm.box = BOX
+  #     node.vm.box_version = BOX_VERSION
+  #     node.vm.network "private_network", ip: ip
+  #     node.vm.hostname = name
+  #     node.vm.provider "virtualbox" do |v|
+  #         v.memory = NODES_MEM
+  #         v.cpus = NODES_CPU
+  #     end
+  #     node.vm.provision "shell", path: "./provision/bin/common.sh", privileged: false, env: {"K8S_VERSION" => K8S_VERSION, "CRI_VERSION" => CRI_VERSION, "CRI_OS" => CRI_OS, "KUBELET_EXTRA_ARGS" => "--node-ip=#{ip}"}
+  #     node.vm.provision "shell", path: "./provision/bin/prepare_node.sh", privileged: false
+  #   end
+  # end
 
 end
