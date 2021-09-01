@@ -22,7 +22,7 @@ Vagrant.configure("2") do |config|
 
   config.vm.hostname = HOSTNAME
   config.vm.network NETWORK_TYPE, ip: NETWORK_IP, hostname: true
-  config.vm.synced_folder HOST_CODE_DIR, GUEST_CODE_DIR, type: "virtualbox"  # default => type: "rsync"
+  config.vm.synced_folder HOST_CODE_DIR, GUEST_CODE_DIR, type: "nfs"  # default => type: "rsync"
 
   config.vm.provider "virtualbox" do |v|
     v.memory = MEMORY
