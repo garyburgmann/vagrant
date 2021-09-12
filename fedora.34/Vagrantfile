@@ -14,7 +14,8 @@ MEMORY = 4096
 CPU = 2
 HOST_CODE_DIR = "~/code"
 GUEST_CODE_DIR = "/home/vagrant/code"
-# GUEST_CODE_DIR = "/mnt/code"
+HOST_KUBE_DIR = "~/.kube"
+GUEST_KUBE_DIR = "/home/vagrant/.kube"
 
 Vagrant.configure("2") do |config|
 
@@ -24,7 +25,10 @@ Vagrant.configure("2") do |config|
 
   config.vm.hostname = HOSTNAME
   config.vm.network NETWORK_TYPE, ip: NETWORK_IP, hostname: true
-  config.vm.synced_folder HOST_CODE_DIR, GUEST_CODE_DIR, type: "nfs"  # default => type: "rsync"
+  config.vm.synced_folder ".", "/vagrant", disabled: true
+  config.vm.synced_folder HOST_CODE_DIR, GUEST_CODE_DIR, type: "nfs"
+  config.vm.synced_folder HOST_KUBE_DIR, GUEST_KUBE_DIR, type: "nfs"
+  # config.vm.synced_folder HOST_CODE_DIR, GUEST_CODE_DIR, type: "nfs", nfs_export: false  # default => type: "rsync"
 
   config.vm.provider "virtualbox" do |v|
     v.memory = MEMORY
