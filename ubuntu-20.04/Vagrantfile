@@ -1,7 +1,7 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-VM_NAME = "ubuntu.focal"
+VM_NAME = "ubuntu-20.04"
 
 BOX = "bento/ubuntu-20.04"
 BOX_VERSION = "202107.28.0"
@@ -13,6 +13,8 @@ MEMORY = 4096
 CPU = 2
 HOST_CODE_DIR = "~/code"
 GUEST_CODE_DIR = "/home/vagrant/code"
+HOST_KUBE_DIR = "~/.kube"
+GUEST_KUBE_DIR = "/home/vagrant/.kube"
 
 Vagrant.configure("2") do |config|
 
@@ -22,7 +24,9 @@ Vagrant.configure("2") do |config|
 
   config.vm.hostname = HOSTNAME
   config.vm.network NETWORK_TYPE, ip: NETWORK_IP, hostname: true
-  config.vm.synced_folder HOST_CODE_DIR, GUEST_CODE_DIR, type: "nfs"  # default => type: "rsync"
+  config.vm.synced_folder ".", "/vagrant", disabled: true
+  config.vm.synced_folder HOST_CODE_DIR, GUEST_CODE_DIR, type: "nfs"
+  config.vm.synced_folder HOST_KUBE_DIR, GUEST_KUBE_DIR, type: "nfs"
 
   config.vm.provider "virtualbox" do |v|
     v.memory = MEMORY
@@ -40,6 +44,7 @@ Vagrant.configure("2") do |config|
 
   config.vm.provision "shell", path: "./bin/provision/upgrade_system.sh", privileged: true
   config.vm.provision "shell", path: "./bin/provision/install_docker.sh", privileged: true
+  config.vm.provision "shell", path: "./bin/provision/install_kubectl.sh", privileged: true
   config.vm.provision "shell", path: "./bin/provision/install_anaconda.sh", privileged: false
 
 end
