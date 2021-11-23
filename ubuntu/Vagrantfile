@@ -1,7 +1,7 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-VM_NAME = "ubuntu-20.04"
+VM_NAME = "ubuntu"
 
 BOX = "bento/ubuntu-20.04"
 BOX_VERSION = "202107.28.0"
