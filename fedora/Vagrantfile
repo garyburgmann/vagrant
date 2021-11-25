@@ -15,6 +15,8 @@ HOST_CODE_DIR = "~/code"
 GUEST_CODE_DIR = "/home/vagrant/code"
 HOST_KUBE_DIR = "~/.kube"
 GUEST_KUBE_DIR = "/home/vagrant/.kube"
+GIT_GLOBAL_USER_NAME = 
+GIT_GLOBAL_USER_EMAIL = 
 
 Vagrant.configure("2") do |config|
 
@@ -55,5 +57,7 @@ Vagrant.configure("2") do |config|
   config.vm.provision "shell", path: "./bin/provision/install_anaconda.sh", privileged: false
   config.vm.provision "shell", path: "./bin/provision/install_nvm.sh", privileged: false
   config.vm.provision "shell", inline: "sudo dnf -y install go", privileged: false
+  config.vm.provision "shell", inline: "git config --global user.name #{GIT_GLOBAL_USER_NAME}", privileged: false
+  config.vm.provision "shell", inline: "git config --global user.email #{GIT_GLOBAL_USER_EMAIL}", privileged: false
 
 end
