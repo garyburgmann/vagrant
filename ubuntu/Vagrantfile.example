@@ -11,12 +11,13 @@ NETWORK_TYPE = "private_network"
 NETWORK_IP = "192.168.56.27"
 MEMORY = 4096
 CPU = 2
+DISKSIZE = "100GB"
 HOST_CODE_DIR = "~/code"
 GUEST_CODE_DIR = "/home/vagrant/code"
 HOST_KUBE_DIR = "~/.kube"
 GUEST_KUBE_DIR = "/home/vagrant/.kube"
-GIT_GLOBAL_USER_NAME = 
-GIT_GLOBAL_USER_EMAIL = 
+GIT_GLOBAL_USER_NAME = "Foo Bar"
+GIT_GLOBAL_USER_EMAIL = "foobar@example.com"
 
 Vagrant.configure("2") do |config|
 
@@ -37,7 +38,7 @@ Vagrant.configure("2") do |config|
   end
 
   if Vagrant.has_plugin?("vagrant-disksize")
-    config.disksize.size = '80GB'
+    config.disksize.size = DISKSIZE
   end
 
   if Vagrant.has_plugin?("vagrant-vbguest")
