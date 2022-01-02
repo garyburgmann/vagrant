@@ -2,8 +2,10 @@
 # vi: set ft=ruby :
 
 VM_NAME = "fedora"
-BOX = "fedora/35-cloud-base"
-BOX_VERSION = "35.20211026.0"
+BOX = "garyburgmann/fedora-35"
+# BOX = "bento/fedora-latest"
+# BOX = "fedora/35-cloud-base"
+# BOX_VERSION = "35.20211026.0"
 
 HOSTNAME = "fedora"
 NETWORK_TYPE = "private_network"
@@ -43,12 +45,13 @@ Vagrant.configure("2") do |config|
 
   if Vagrant.has_plugin?("vagrant-vbguest")
     # config.vbguest.auto_update = false
+    config.vbguest.installer_options = { allow_kernel_upgrade: true }
     # don't run dnf update otherwise kernel updates will cause issues with guest additions upgrades
-    config.vbguest.installer_hooks[:before_install] = [
-      # "dnf update -y",
-      "dnf install -y gcc make perl kernel-devel-$(uname -r) bzip2 dkms",
-      # "dnf update -y kernel-*",
-    ]
+    # config.vbguest.installer_hooks[:before_install] = [
+    #   # "dnf update -y",
+    #   "dnf install -y gcc make perl kernel-devel-$(uname -r) bzip2 dkms",
+    #   # "dnf update -y kernel-*",
+    # ]
   end
 
   config.vm.provision "shell", path: "./bin/provision/install_base.sh", privileged: false
