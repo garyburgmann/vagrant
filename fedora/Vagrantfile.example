@@ -3,6 +3,7 @@
 
 VM_NAME = "fedora"
 BOX = "garyburgmann/fedora-35"
+BOX_VERSION = "202201.02.0"
 # BOX = "bento/fedora-latest"
 # BOX = "fedora/35-cloud-base"
 # BOX_VERSION = "35.20211026.0"
