@@ -1,23 +1,23 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-VM_NAME = "ubuntu"
+VM_NAME = "debian"
 
-BOX = "bento/ubuntu-20.04"
+BOX = "bento/debian-11"
 BOX_VERSION = "202206.03.0"
 
-HOSTNAME = "ubuntu"
+HOSTNAME = "debian"
 NETWORK_TYPE = "private_network"
-NETWORK_IP = "192.168.56.27"
+NETWORK_IP = "192.168.56.93"
 MEMORY = 4096
 CPU = 2
-DISKSIZE = "100GB"
+DISKSIZE = "120GB"
 HOST_CODE_DIR = "~/code"
-GUEST_CODE_DIR = "/home/vagrant/code"
+GUEST_CODE_DIR = "/mnt/code"
 HOST_KUBE_DIR = "~/.kube"
 GUEST_KUBE_DIR = "/home/vagrant/.kube"
-GIT_GLOBAL_USER_NAME = "Foo Bar"
-GIT_GLOBAL_USER_EMAIL = "foobar@example.com"
+GIT_GLOBAL_USER_NAME = "Gary Burgmann"
+GIT_GLOBAL_USER_EMAIL = "gary.burgmann@go1.com"
 
 Vagrant.configure("2") do |config|
 
@@ -28,8 +28,8 @@ Vagrant.configure("2") do |config|
   config.vm.hostname = HOSTNAME
   config.vm.network NETWORK_TYPE, ip: NETWORK_IP, hostname: true
   config.vm.synced_folder ".", "/vagrant", disabled: true
-  config.vm.synced_folder HOST_CODE_DIR, GUEST_CODE_DIR, type: "nfs"
-  config.vm.synced_folder HOST_KUBE_DIR, GUEST_KUBE_DIR, type: "nfs"
+  config.vm.synced_folder HOST_CODE_DIR, GUEST_CODE_DIR
+  config.vm.synced_folder HOST_KUBE_DIR, GUEST_KUBE_DIR
 
   config.vm.provider "virtualbox" do |v|
     v.memory = MEMORY
@@ -42,23 +42,16 @@ Vagrant.configure("2") do |config|
   end
 
   if Vagrant.has_plugin?("vagrant-vbguest")
-    # config.vbguest.auto_update = false
     config.vbguest.installer_options = { allow_kernel_upgrade: true }
-    # config.vbguest.installer_hooks[:before_install] = [
-    #   "apt update -y",
-    #   "apt install -y build-essential dkms linux-headers-$(uname -r)",
-    # ]
   end
 
   config.vm.provision "shell", path: "./bin/provision/upgrade_system.sh", privileged: true
+  config.vm.provision "shell", inline: "apt-get update && apt-get install -y git", privileged: true
   config.vm.provision "shell", inline: "git config --global user.name #{GIT_GLOBAL_USER_NAME}", privileged: false
   config.vm.provision "shell", inline: "git config --global user.email #{GIT_GLOBAL_USER_EMAIL}", privileged: false
   config.vm.provision "shell", path: "./bin/provision/install_docker.sh", privileged: true
   config.vm.provision "shell", path: "./bin/provision/install_minikube.sh", privileged: false
   config.vm.provision "shell", path: "./bin/provision/install_nvm.sh", privileged: false
-  config.vm.provision "shell", inline: "sudo snap install go --classic", privileged: false
-  config.vm.provision "shell", inline: "sudo snap install kubectl --classic", privileged: false
-  config.vm.provision "shell", inline: "sudo snap install fluxctl --classic", privileged: false
-  config.vm.provision "shell", path: "./bin/provision/install_anaconda.sh", privileged: false
-
+  config.vm.provision "shell", path: "./bin/provision/install_kubectl.sh", privileged: false
+  # config.vm.provision "shell", path: "./bin/provision/install_anaconda.sh", privileged: false
 end
