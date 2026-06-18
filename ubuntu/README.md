@@ -1,4 +1,4 @@
-# ubuntu-20.04
+# ubuntu-24.04
 
 ### installs
 - docker
