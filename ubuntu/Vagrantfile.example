@@ -1,35 +1,39 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
+require "shellwords"
+
+Vagrant.require_version ">= 2.2.10"
+
 VM_NAME = "ubuntu"
 
-BOX = "bento/ubuntu-20.04"
-BOX_VERSION = "202206.03.0"
+BOX = "bento/ubuntu-24.04"
+# BOX_VERSION = "202606.01.0"
 
 HOSTNAME = "ubuntu"
 NETWORK_TYPE = "private_network"
 NETWORK_IP = "192.168.56.27"
-MEMORY = 4096
-CPU = 2
-DISKSIZE = "100GB"
+MEMORY = 8192
+CPU = 4
+DISKSIZE = "200GB"
 HOST_CODE_DIR = "~/code"
 GUEST_CODE_DIR = "/mnt/code"
-HOST_KUBE_DIR = "~/.kube"
-GUEST_KUBE_DIR = "/home/vagrant/.kube"
+# HOST_KUBE_DIR = "~/.kube"
+# GUEST_KUBE_DIR = "/home/vagrant/.kube"
 GIT_GLOBAL_USER_NAME = "Foo Bar"
 GIT_GLOBAL_USER_EMAIL = "foobar@example.com"
 
 Vagrant.configure("2") do |config|
 
   config.vm.box = BOX
-  config.vm.box_version = BOX_VERSION
+  # config.vm.box_version = BOX_VERSION
   config.vm.define VM_NAME
 
   config.vm.hostname = HOSTNAME
   config.vm.network NETWORK_TYPE, ip: NETWORK_IP, hostname: true
   config.vm.synced_folder ".", "/vagrant", disabled: true
   config.vm.synced_folder HOST_CODE_DIR, GUEST_CODE_DIR
-  config.vm.synced_folder HOST_KUBE_DIR, GUEST_KUBE_DIR
+  # config.vm.synced_folder HOST_KUBE_DIR, GUEST_KUBE_DIR
 
   config.vm.provider "virtualbox" do |v|
     v.memory = MEMORY
@@ -37,24 +41,30 @@ Vagrant.configure("2") do |config|
     v.name = VM_NAME
   end
 
-  if Vagrant.has_plugin?("vagrant-disksize")
-    config.disksize.size = DISKSIZE
-  end
+  config.vm.disk :disk, size: DISKSIZE, primary: true
 
   if Vagrant.has_plugin?("vagrant-vbguest")
+    # Modern Bento boxes usually include suitable guest additions already.
+    config.vbguest.auto_update = false
     config.vbguest.installer_options = { allow_kernel_upgrade: true }
   end
 
   config.vm.provision "shell", path: "./bin/provision/upgrade_system.sh", privileged: true
-  config.vm.provision "shell", inline: "apt-get update && apt-get install -y git", privileged: true
-  config.vm.provision "shell", inline: "git config --global user.name #{GIT_GLOBAL_USER_NAME}", privileged: false
-  config.vm.provision "shell", inline: "git config --global user.email #{GIT_GLOBAL_USER_EMAIL}", privileged: false
+  config.vm.provision "resize_root_disk", type: "shell", path: "./bin/provision/resize_root_disk.sh", privileged: true
+  config.vm.provision "shell", inline: "apt-get update && apt-get install -y ca-certificates curl git openssh-client", privileged: true
+  config.vm.provision "install_bash_completion", type: "shell", path: "./bin/provision/install_bash_completion.sh", privileged: true
+  config.vm.provision "shell", inline: "git config --global user.name #{GIT_GLOBAL_USER_NAME.shellescape}", privileged: false
+  config.vm.provision "shell", inline: "git config --global user.email #{GIT_GLOBAL_USER_EMAIL.shellescape}", privileged: false
+  config.vm.provision "generate_ssh_key", type: "shell", path: "./bin/provision/generate_ssh_key.sh", privileged: false
+  config.vm.provision "install_ondrej_php", type: "shell", path: "./bin/provision/install_ondrej_php.sh", privileged: true
+  config.vm.provision "install_azure_cli", type: "shell", path: "./bin/provision/install_azure_cli.sh", privileged: true
+  config.vm.provision "install_aws_cli", type: "shell", path: "./bin/provision/install_aws_cli.sh", privileged: true
   config.vm.provision "shell", path: "./bin/provision/install_docker.sh", privileged: true
   # config.vm.provision "shell", path: "./bin/provision/install_minikube.sh", privileged: false
   config.vm.provision "shell", path: "./bin/provision/install_nvm.sh", privileged: false
   # config.vm.provision "shell", inline: "sudo snap install go --classic", privileged: false
   config.vm.provision "shell", inline: "sudo snap install kubectl --classic", privileged: false
   # config.vm.provision "shell", inline: "sudo snap install fluxctl --classic", privileged: false
-  # config.vm.provision "shell", path: "./bin/provision/install_anaconda.sh", privileged: false
+  # config.vm.provision "shell", path: "./bin/provision/install_miniconda.sh", privileged: false
   
 end

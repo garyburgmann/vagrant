@@ -2,5 +2,9 @@
 
 ### installs
 - docker
+- ondrej/php ppa
+- azure cli
+- aws cli
+- node lts
 - kubectl
-- anaconda3
+- miniconda3
