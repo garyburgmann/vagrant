@@ -49,6 +49,7 @@ Vagrant.configure("2") do |config|
     config.vbguest.installer_options = { allow_kernel_upgrade: true }
   end
 
+  config.vm.provision "configure_clock_sync", type: "shell", path: "./bin/provision/configure_clock_sync.sh", privileged: true
   config.vm.provision "shell", path: "./bin/provision/upgrade_system.sh", privileged: true
   config.vm.provision "resize_root_disk", type: "shell", path: "./bin/provision/resize_root_disk.sh", privileged: true
   config.vm.provision "shell", inline: "apt-get update && apt-get install -y ca-certificates curl git openssh-client", privileged: true
