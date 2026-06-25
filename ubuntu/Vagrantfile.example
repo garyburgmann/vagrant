@@ -39,6 +39,8 @@ Vagrant.configure("2") do |config|
     v.memory = MEMORY
     v.cpus = CPU
     v.name = VM_NAME
+    v.customize ["modifyvm", :id, "--natdnsproxy1", "on"]
+    v.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
   end
 
   config.vm.disk :disk, size: DISKSIZE, primary: true
